@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 || exit ; pwd -P )"
 
@@ -84,5 +84,21 @@ ask_install() {
 # Homebrew
 
 if ask_install "brew"; then
+	ohai "Installing homebrew..."
+
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# ASDF
+
+if ask_install "asdf"; then
+	ohai "Installing ASDF..."
+
+	brew install coreutils curl git asdf
+
+	echo -e "\n. $(brew --prefix asdf)/libexec/asdf.sh" >> ${ZDOTDIR:-~}/.zprofile
+	. $(brew --prefix asdf)/libexec/asdf.sh
 fi
