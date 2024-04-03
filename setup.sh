@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 || exit ; pwd -P )"
 
@@ -88,7 +88,8 @@ if ask_install "brew"; then
 
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+	# shellcheck disable=SC2016
+	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "${ZDOTDIR:-~}"/.zprofile
 	eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
@@ -99,6 +100,9 @@ if ask_install "asdf"; then
 
 	brew install coreutils curl git asdf
 
-	echo -e "\n. $(brew --prefix asdf)/libexec/asdf.sh" >> ${ZDOTDIR:-~}/.zprofile
-	. $(brew --prefix asdf)/libexec/asdf.sh
+	# shellcheck disable=SC2016
+	echo '. $(brew --prefix asdf)/libexec/asdf.sh' >> "${ZDOTDIR:-~}"/.zprofile
+
+	# shellcheck disable=SC1091
+	. "$(brew --prefix asdf)"/libexec/asdf.sh
 fi
