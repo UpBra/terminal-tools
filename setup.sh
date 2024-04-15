@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 || exit ; pwd -P )"
-
-if [[ -t 1 ]]; then TTY=0; fi
-tty_escape() { if [ "$TTY" -eq 0 ]; then printf "\033[%sm" "$1"; else :; fi }
-tty_mkbold() { tty_escape "1;$1"; }
-tty_underline="$(tty_escape "4;39")"
-tty_blue="$(tty_mkbold 34)"
-tty_red="$(tty_mkbold 31)"
-tty_bold="$(tty_mkbold 39)"
-tty_reset="$(tty_escape 0)"
+ttys() { if [[ ! -t 1 ]]; then printf "\033[%sm" "$1"; else :; fi }
+ttyr() { ttys 0; }
+tty0() { ttys "0;$1"; }
+tty1() { ttys "1;$1"; }
+info() { printf "$(tty0 32)%s$(ttyr)\n" "$@"; }
+warn() { printf "$(tty1 31)Warning$(ttyr): $(tty1 30)%s$(ttyr)\n" "$@"; }
 
 usage() {
 cat <<EOS
@@ -19,29 +16,6 @@ Usage: setup.sh [options]
 	-f, --force		Force. Install without prompting for user input
 EOS
 exit "${1:-0}"
-}
-
-shell_join() {
-	local arg
-	printf "%s" "$1"
-	shift
-	for arg in "$@"
-	do
-		printf " "
-		printf "%s" "${arg// /\ }"
-	done
-}
-
-chomp() {
-	printf "%s" "${1/"$'\n'"/}"
-}
-
-ohai() {
-	printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
-}
-
-warn() {
-	printf "${tty_red}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
 while [[ $# -gt 0 ]]
@@ -89,7 +63,7 @@ test -f "$dotzprofile" || touch "$dotzprofile"
 # Homebrew
 
 if ask_install "brew"; then
-	ohai "Installing homebrew..."
+	info "Installing homebrew..."
 
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -101,7 +75,7 @@ fi
 # ASDF
 
 if ask_install "asdf"; then
-	ohai "Installing ASDF..."
+	info "Installing ASDF..."
 
 	brew install coreutils curl git asdf
 
