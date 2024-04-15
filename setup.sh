@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]
 do
 	case "$1" in
 		-h | --help) usage ;;
-		-f | --force) force=0 ;;
+		-f | --force) force=true ;;
 		*)
 			warn "Unrecognized option: '$1'"
 			usage 1
@@ -35,7 +35,7 @@ done
 
 ask() {
 	# if force flag then don't ask. return yes
-	if [ "$force" -eq 0 ]; then exit 0; fi
+	[[ -n ${force} ]] && return 0
 
 	echo "$1"
 	select yn in "Yes" "No"; do
