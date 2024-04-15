@@ -57,7 +57,7 @@ ask_install() {
 
 # Dot Zprofile
 
-dotzprofile="${ZDOTDIR:-$HOME}/.zprofiles"
+dotzprofile="${ZDOTDIR:-$HOME}/.zprofile"
 [ ! -f "$dotzprofile" ] && touch "$dotzprofile"
 
 # Homebrew
