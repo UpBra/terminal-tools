@@ -74,6 +74,7 @@ if ask_install "brew"; then
 	printInfo "Installing homebrew..."
 
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	eval "$(/opt/homebrew/bin/brew shellenv)"
 
 	check_install "brew" || {
 		printError "Homebrew was not installed successfully. Please install homebrew: https://brew.sh/"
@@ -82,7 +83,6 @@ if ask_install "brew"; then
 
 	# shellcheck disable=SC2016
 	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$dotzprofile"
-	eval "$(/opt/homebrew/bin/brew shellenv)"
 
 	tput clear
 
