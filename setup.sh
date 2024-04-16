@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 || exit ; pwd -P )"
-ttys() { if [[ ! -t 1 ]]; then printf "\033[%sm" "$1"; else :; fi }
-ttyr() { ttys 0; }
-tty0() { ttys "0;$1"; }
-tty1() { ttys "1;$1"; }
-info() { printf "$(tty0 32)%s$(ttyr)\n" "$@"; }
-warn() { printf "$(tty1 31)Warning$(ttyr): $(tty1 30)%s$(ttyr)\n" "$@"; }
+BOLD() { tput bold; }
+RED() { tput setaf 1; }
+GREEN() { tput setaf 2; }
+NORMAL() { tput sgr0; }
+printInfo() { BOLD; printf "%s\n" "$1"; NORMAL; }
+printSuccess() { BOLD; GREEN; printf "%s\n" "$1"; NORMAL; }
+printError() { BOLD; RED; printf "%s\n" "$1"; NORMAL; }
 
 usage() {
 cat <<EOS
@@ -24,14 +24,18 @@ do
 		-h | --help) usage ;;
 		-f | --force) force=true ;;
 		*)
-			warn "Unrecognized option: '$1'"
+			printError "Unrecognized option: '$1'"
 			usage 1
 			;;
 	esac
 	shift
 done
 
-# Ask Methods
+# Methods
+
+check_install() {
+	type "$1" &> /dev/null
+}
 
 ask() {
 	# if force flag then don't ask. return yes
@@ -63,9 +67,14 @@ dotzprofile="${ZDOTDIR:-$HOME}/.zprofile"
 # Homebrew
 
 if ask_install "brew"; then
-	info "Installing homebrew..."
+	printInfo "Installing homebrew..."
 
-	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 1> /dev/null
+
+	check_install "brew" || {
+		printError "Homebrew was not installed successfully. Please install homebrew: https://brew.sh/"
+		exit 1
+	}
 
 	# shellcheck disable=SC2016
 	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$dotzprofile"
@@ -75,9 +84,14 @@ fi
 # ASDF
 
 if ask_install "asdf"; then
-	info "Installing ASDF..."
+	printInfo "Installing ASDF..."
 
 	brew install coreutils curl git asdf
+
+	check_install "asdf" || {
+		printError "ASDF was not installed successfully. Please install asdf: https://asdf-vm.com/guide/getting-started.html"
+		exit 1
+	}
 
 	# shellcheck disable=SC2016
 	echo '. $(brew --prefix asdf)/libexec/asdf.sh' >> "$dotzprofile"
