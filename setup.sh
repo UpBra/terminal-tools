@@ -64,12 +64,16 @@ ask_install() {
 dotzprofile="${ZDOTDIR:-$HOME}/.zprofile"
 [ ! -f "$dotzprofile" ] && touch "$dotzprofile"
 
+# Start
+
+tput clear
+
 # Homebrew
 
 if ask_install "brew"; then
 	printInfo "Installing homebrew..."
 
-	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 1> /dev/null
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 	check_install "brew" || {
 		printError "Homebrew was not installed successfully. Please install homebrew: https://brew.sh/"
@@ -79,6 +83,10 @@ if ask_install "brew"; then
 	# shellcheck disable=SC2016
 	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$dotzprofile"
 	eval "$(/opt/homebrew/bin/brew shellenv)"
+
+	tput clear
+
+	printSuccess "Finished installing Homebrew"
 fi
 
 # ASDF
@@ -98,4 +106,8 @@ if ask_install "asdf"; then
 
 	# shellcheck disable=SC1091
 	. "$(brew --prefix asdf)"/libexec/asdf.sh
+
+	tput clear
+
+	printSuccess "Finished installing ASDF"
 fi
