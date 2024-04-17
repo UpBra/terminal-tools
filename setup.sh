@@ -158,6 +158,6 @@ do
 done
 
 printInfo ""
-printError "Quit and re-open your terminal for the changes to take affect!"
+printError "Quit and re-open your terminal for the changes to take effect!"
 
 exit 0
